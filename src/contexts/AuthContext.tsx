@@ -32,7 +32,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const userInfo = localStorage.getItem("userInfo");
     if (userInfo) {
-      setUser(JSON.parse(userInfo));
+      try {
+        const parsedUser = JSON.parse(userInfo);
+        setUser(parsedUser);
+      } catch (error) {
+        console.error("Failed to parse user info from local storage", error);
+        localStorage.removeItem("userInfo");
+        localStorage.removeItem("token");
+      }
     }
     setLoading(false);
   }, []);
