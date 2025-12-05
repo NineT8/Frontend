@@ -30,7 +30,7 @@ const Analytics = () => {
 
   const fetchEntries = async () => {
     try {
-      const { data } = await api.get("/entries");
+      const { data } = await api.get("/entries/all");
       // Map _id to id for compatibility
       const mappedData = data.map((entry: any) => ({
         ...entry,

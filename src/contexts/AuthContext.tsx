@@ -18,6 +18,8 @@ interface AuthContextType {
   signUp: (email: string, password: string, name: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => void;
+  updateProfile: (name: string, password?: string) => Promise<void>;
+  deleteAccount: () => Promise<void>;
   loading: boolean;
 }
 
@@ -96,8 +98,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     navigate("/");
   };
 
+  const updateProfile = async (name: string, password?: string) => {
+    try {
+      const { data } = await api.put("/auth/profile", { name, password });
+
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      localStorage.setItem("token", data.token);
+
+      setUser(data);
+      toast.success("Profile updated successfully");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to update profile");
+      throw error;
+    }
+  };
+
+  const deleteAccount = async () => {
+    try {
+      await api.delete("/auth/profile");
+      signOut();
+      toast.success("Account deleted successfully");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to delete account");
+      throw error;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, signUp, signIn, signOut, loading }}>
+    <AuthContext.Provider value={{ user, signUp, signIn, signOut, updateProfile, deleteAccount, loading }}>
       {children}
     </AuthContext.Provider>
   );
